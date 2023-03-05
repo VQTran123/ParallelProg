@@ -16,11 +16,11 @@ int MPI_P2P_Reduce(long long *sendbuf, long long *recvbuf, int count, MPI_Dataty
     while(step <= size) {
         if(rank%step == step/2) {
             MPI_Isend(&sendbuf,count,datatype,rank - step/2,1,comm,&request);
-            MPI_WAIT(&request, &status);
+            MPI_Wait(&request, &status);
         }
         else if(rank%step == 0) {
             MPI_Irecv(&recvbuf,count,datatype,rank + step/2,1,comm,&request);
-            MPI_WAIT(&request, &status);
+            MPI_Wait(&request, &status);
             *sendbuf += *recvbuf;
         }
         step *= 2;
