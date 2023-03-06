@@ -20,17 +20,19 @@ int MPI_P2P_Reduce(
             MPI_Status status;
             MPI_Request requestSend, requestReceive;
             int partner = rank ^ stride;
-            if(rank < partner){
-                MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
-                MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
-                MPI_Wait(&requestReceive, &status);
-                *send_data += *recv_data;
-            }
-            else {
-                MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
-                MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
-                MPI_Wait(&requestSend, &status);
-                *send_data += *recv_data;
+            if(partner > 0 && partner < size){
+                if(rank < partner){
+                    MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
+                    MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
+                    MPI_Wait(&requestReceive, &status);
+                    *send_data += *recv_data;
+                }
+                else {
+                    MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
+                    MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
+                    MPI_Wait(&requestSend, &status);
+                    *send_data += *recv_data;
+                }
             }
         }
         
@@ -80,7 +82,7 @@ int main(int argc, char** argv){
     printf("%llu\n",sum);
 
     double start_cycles=clock_now();
-    MPI_P2P_Reduce(&sum,&finalSum,1,MPI_LONG_LONG,MPI_COMM_WORLD);
+    MPI_P2P_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_COMM_WORLD);
     double end_cycles=clock_now();
 
     if(rank == 0){
@@ -90,7 +92,7 @@ int main(int argc, char** argv){
     printf("P2P time: %f\n", p2pTime);
 
     start_cycles=clock_now();
-    MPI_Reduce(&sum,&finalSum,1,MPI_LONG_LONG,MPI_SUM,0,MPI_COMM_WORLD);
+    MPI_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_SUM,0,MPI_COMM_WORLD);
     end_cycles=clock_now();
 
     double reduceTime = (end_cycles - start_cycles)/clock_frequency;
