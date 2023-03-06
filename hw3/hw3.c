@@ -14,15 +14,35 @@ int MPI_P2P_Reduce(
     MPI_Comm comm){
         MPI_Status status;
         MPI_Request request;
-        int rank;
+        int rank, size;
+        int stride = 2;
         MPI_Comm_rank(comm,&rank);
+        MPI_Comm_size(comm,&size);
 
+        while(stride <= size){
+            if(rank%stride == stride/2){
+                MPI_Isend(&sendbuf,count,datatype,(rank - stride)/2,1,comm,&request);
+                MPI_Wait(&request, &status);
+            }
+            else if(rank%stride == 0) {
+                MPI_Irecv(&recvbuf,count,datatype,(rank + stride)/2,1,comm,&request);
+                MPI_Wait(&request, &status);
+                *sendbuf += *recvbuf;
+            }
+            step *= 2;
+        }
+        
         if(rank == 0){
+            printf("%llu\n",*recvbuf);
+        }
+
+        /*if(rank == 0){
             int size;
             long long sum = 0;
             MPI_Comm_size(comm,&size);
             for(int i = 0; i < size; i++){
                 if(i != 0){
+                    printf("%llu\n",sum);
                     MPI_Irecv(&recv_data,count,datatype,i,1,comm,&request);
                     MPI_Wait(&request, &status);
                     sum += *recv_data;
@@ -34,7 +54,7 @@ int MPI_P2P_Reduce(
             *send_data += *recv_data;
             MPI_Isend(&send_data,count,datatype,0,1,comm,&request);
             MPI_Wait(&request, &status);
-        }
+        }*/
         return MPI_SUCCESS;
     }
 
