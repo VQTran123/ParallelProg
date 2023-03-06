@@ -12,24 +12,26 @@ int MPI_P2P_Reduce(
     int count,
     MPI_Datatype datatype,
     MPI_Comm comm){
-        MPI_Status status;
-        MPI_Request request;
         int rank, size;
-        int stride = 2;
         MPI_Comm_rank(comm,&rank);
         MPI_Comm_size(comm,&size);
 
-        while(stride <= size){
-            if(rank%stride == stride/2){
-                MPI_Isend(&send_data,count,datatype,(rank - stride)/2,1,comm,&request);
-                MPI_Wait(&request, &status);
-            }
-            else if(rank%stride == 0) {
-                MPI_Irecv(&recv_data,count,datatype,(rank + stride)/2,1,comm,&request);
-                MPI_Wait(&request, &status);
+        for(int stride = 1; stride < size; stride *= 2){
+            MPI_Status status;
+            MPI_Request requestSend, requestReceive;
+            int partner = rank ^ stride;
+            if(rank < partner){
+                MPI_Isend(&send_data,count,datatype,(rank - stride)/2,1,comm,&requestSend);
+                MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
+                MPI_Wait(&requestReceive, &status);
                 *send_data += *recv_data;
             }
-            stride *= 2;
+            else {
+                MPI_Irecv(&recv_data,count,datatype,(rank + stride)/2,1,comm,&requestReceive);
+                MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
+                MPI_Wait(&requestSend, &status);
+                *send_data += *recv_data;
+            }
         }
         
         if(rank == 0){
