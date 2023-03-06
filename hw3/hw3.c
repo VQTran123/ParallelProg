@@ -13,28 +13,27 @@ int MPI_P2P_Reduce(
     MPI_Datatype datatype,
     MPI_Comm comm){
         MPI_Status status;
+        MPI_Request request;
         int rank;
         MPI_Comm_rank(comm,&rank);
 
         if(rank == 0){
-            MPI_Request request;
             int size;
             long long sum = 0;
             MPI_Comm_size(comm,&size);
             for(int i = 0; i < size; i++){
                 if(i != 0){
                     MPI_Irecv(&recv_data,count,datatype,0,1,comm,&request);
-                    printf("%d\n",size);
+                    MPI_Wait(&request, &status);
                     sum += *recv_data;
                 }
             }
             printf("Total sum: %llu\n", sum);
         }
         else{
-            MPI_Request request;
-            MPI_Irecv(&recv_data,count,datatype,0,1,comm,&request);
             *send_data += *recv_data;
             MPI_Isend(&send_data,count,datatype,0,1,comm,&request);
+            MPI_Wait(&request, &status);
         }
         return MPI_SUCCESS;
     }
@@ -56,7 +55,7 @@ int main(int argc, char** argv){
         sum += array[i];
     }
 
-    
+    printf("%llu\n",sum);
 
     double start_cycles=clock_now();
     MPI_P2P_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_COMM_WORLD);
