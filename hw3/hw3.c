@@ -21,13 +21,13 @@ int MPI_P2P_Reduce(
             MPI_Request requestSend, requestReceive;
             int partner = rank ^ stride;
             if(rank < partner){
-                MPI_Isend(&send_data,count,datatype,(rank - stride)/2,1,comm,&requestSend);
+                MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
                 MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
                 MPI_Wait(&requestReceive, &status);
                 *send_data += *recv_data;
             }
             else {
-                MPI_Irecv(&recv_data,count,datatype,(rank + stride)/2,1,comm,&requestReceive);
+                MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
                 MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
                 MPI_Wait(&requestSend, &status);
                 *send_data += *recv_data;
