@@ -24,7 +24,7 @@ int MPI_P2P_Reduce(
             for(int i = 0; i < size; i++){
                 if(i != 0){
                     MPI_Irecv(&recv_data,count,datatype,0,1,comm,&request);
-                    printf("%llu\n",*size);
+                    printf("%d\n",size);
                     sum += *recv_data;
                 }
             }
