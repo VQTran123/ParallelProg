@@ -24,7 +24,7 @@ int MPI_P2P_Reduce(
             for(int i = 0; i < size; i++){
                 if(i != 0){
                     MPI_Irecv(&recv_data,count,datatype,0,1,comm,&request);
-                    printf("%llu\n",*recv_data);
+                    printf("%llu\n",*size);
                     sum += *recv_data;
                 }
             }
@@ -56,9 +56,13 @@ int main(int argc, char** argv){
         sum += array[i];
     }
 
+    
+
     double start_cycles=clock_now();
     MPI_P2P_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_COMM_WORLD);
     double end_cycles=clock_now();
+
+    if(rank == 0){
 
     double p2pTime = (end_cycles - start_cycles)/clock_frequency;
 
@@ -71,6 +75,7 @@ int main(int argc, char** argv){
     double reduceTime = (end_cycles - start_cycles)/clock_frequency;
 
     printf("Reduce time: %d\n", reduceTime);
+    }
 
     free(array);
 
