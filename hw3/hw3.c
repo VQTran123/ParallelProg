@@ -21,19 +21,19 @@ int MPI_P2P_Reduce(
 
         while(stride <= size){
             if(rank%stride == stride/2){
-                MPI_Isend(&sendbuf,count,datatype,(rank - stride)/2,1,comm,&request);
+                MPI_Isend(&send_data,count,datatype,(rank - stride)/2,1,comm,&request);
                 MPI_Wait(&request, &status);
             }
             else if(rank%stride == 0) {
-                MPI_Irecv(&recvbuf,count,datatype,(rank + stride)/2,1,comm,&request);
+                MPI_Irecv(&recv_data,count,datatype,(rank + stride)/2,1,comm,&request);
                 MPI_Wait(&request, &status);
-                *sendbuf += *recvbuf;
+                *send_data += *recv_data;
             }
-            step *= 2;
+            stride *= 2;
         }
         
         if(rank == 0){
-            printf("%llu\n",*recvbuf);
+            printf("%llu\n",*recv_data);
         }
 
         /*if(rank == 0){
