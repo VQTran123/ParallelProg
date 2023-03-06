@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
-#include "clockcyle.h"
+#include "clockcycle.h"
 
 #define ARRAY_SIZE 1000000000
 #define clock_frequency 512000000
