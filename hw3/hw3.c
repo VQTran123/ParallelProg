@@ -81,15 +81,15 @@ int main(int argc, char** argv){
 
     printf("%llu\n",sum);
 
-    double start_cycles=clock_now();
+    /*double start_cycles=clock_now();
     MPI_P2P_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_COMM_WORLD);
     double end_cycles=clock_now();
-
+*/
     if(rank == 0){
 
-    double p2pTime = (end_cycles - start_cycles)/clock_frequency;
+    //double p2pTime = (end_cycles - start_cycles)/clock_frequency;
 
-    printf("P2P time: %f\n", p2pTime);
+    //printf("P2P time: %f\n", p2pTime);
 
     start_cycles=clock_now();
     MPI_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_SUM,0,MPI_COMM_WORLD);
