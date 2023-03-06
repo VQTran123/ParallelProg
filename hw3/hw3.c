@@ -91,9 +91,9 @@ int main(int argc, char** argv){
 
     //printf("P2P time: %f\n", p2pTime);
 
-    start_cycles=clock_now();
+    double start_cycles=clock_now();
     MPI_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_SUM,0,MPI_COMM_WORLD);
-    end_cycles=clock_now();
+    double end_cycles=clock_now();
 
     double reduceTime = (end_cycles - start_cycles)/clock_frequency;
 
