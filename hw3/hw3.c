@@ -20,7 +20,7 @@ int MPI_P2P_Reduce(
             MPI_Status status;
             MPI_Request requestSend, requestReceive;
             int partner = rank ^ stride;
-            if(partner > 0 && partner < size){
+            if(partner >= 0 && partner < size){
                 if(rank < partner){
                     MPI_Isend(&send_data,count,datatype,partner,1,comm,&requestSend);
                     MPI_Irecv(&recv_data,count,datatype,partner,1,comm,&requestReceive);
@@ -37,28 +37,9 @@ int MPI_P2P_Reduce(
         }
         
         if(rank == 0){
-            printf("%llu\n",*recv_data);
+            printf("Total sum: %llu\n",*recv_data);
         }
 
-        /*if(rank == 0){
-            int size;
-            long long sum = 0;
-            MPI_Comm_size(comm,&size);
-            for(int i = 0; i < size; i++){
-                if(i != 0){
-                    printf("%llu\n",sum);
-                    MPI_Irecv(&recv_data,count,datatype,i,1,comm,&request);
-                    MPI_Wait(&request, &status);
-                    sum += *recv_data;
-                }
-            }
-            printf("Total sum: %llu\n", sum);
-        }
-        else{
-            *send_data += *recv_data;
-            MPI_Isend(&send_data,count,datatype,0,1,comm,&request);
-            MPI_Wait(&request, &status);
-        }*/
         return MPI_SUCCESS;
     }
 
@@ -68,6 +49,8 @@ int main(int argc, char** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+
+    //Compute local array sum
     int elements = ARRAY_SIZE/size;
     long long sum, finalSum = 0;
     long long *array = (long long*)malloc(elements*sizeof(long long));
@@ -79,21 +62,21 @@ int main(int argc, char** argv){
         sum += array[i];
     }
 
-    printf("%llu\n",sum);
-
-    /*double start_cycles=clock_now();
+    double start_cycles=clock_now();
     MPI_P2P_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_COMM_WORLD);
     double end_cycles=clock_now();
-*/
+
+
+    //Display results for root process
     if(rank == 0){
 
-    //double p2pTime = (end_cycles - start_cycles)/clock_frequency;
+    double p2pTime = (end_cycles - start_cycles)/clock_frequency;
 
-    //printf("P2P time: %f\n", p2pTime);
+    printf("P2P time: %f\n", p2pTime);
 
-    double start_cycles=clock_now();
+    start_cycles=clock_now();
     MPI_Reduce(&sum,&finalSum,sizeof(MPI_LONG_LONG),MPI_LONG_LONG,MPI_SUM,0,MPI_COMM_WORLD);
-    double end_cycles=clock_now();
+    end_cycles=clock_now();
 
     double reduceTime = (end_cycles - start_cycles)/clock_frequency;
 
