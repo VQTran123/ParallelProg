@@ -6,7 +6,6 @@
 
 #define warpSize 32
 #define blockSize 1024
-#define elements 1610612736
 #define nIsPow2 true
 
 __global__ void reduce7(double *g_idata, double *g_odata,
@@ -24,9 +23,9 @@ __global__ void reduce7(double *g_idata, double *g_odata,
 
   int mySum = 0;
 
-  // we reduce multiple elements per thread.  The number is determined by the
+  // we reduce multiple num per thread.  The number is determined by the
   // number of active thread blocks (via gridDim).  More blocks will result
-  // in a larger gridSize and therefore fewer elements per thread
+  // in a larger gridSize and therefore fewer num per thread
   if (nIsPow2) {
     unsigned int i = blockIdx.x * blockSize * 2 + threadIdx.x;
     gridSize = gridSize << 1;
