@@ -36,9 +36,9 @@ int main(int argc, char** argv){
     //Display results for root process
     if(rank == 0){
 
-        start_cycles=clock_now();
+        double start_cycles=clock_now();
         MPI_Reduce(&sum,&finalSum,sizeof(MPI_DOUBLE),MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-        end_cycles=clock_now();
+        double end_cycles=clock_now();
 
         double reduceTime = (end_cycles - start_cycles)/clock_frequency;
 
@@ -49,10 +49,10 @@ int main(int argc, char** argv){
     reduceSeven(&sum,&finalSum,ARRAY_SIZE);
     
     if(rank == 0){
-        start_cycles=clock_now()
+        double start_cycles=clock_now()
         reduceSeven(&sum,&finalSum,ARRAY_SIZE);
         MPI_Reduce(&sum,&finalSum,sizeof(MPI_DOUBLE),MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-        end_cycles=clock_now();
+        double end_cycles=clock_now();
 
         double reduceTime = (end_cycles - start_cycles)/clock_frequency;
 
