@@ -7,7 +7,7 @@
 #define ARRAY_SIZE 1610612736
 #define clock_frequency 512000000
 
-void reduceSeven(int *g_idata, int *g_odata, unsigned int n);
+void reduceSeven(double *g_idata, double *g_odata, unsigned int n);
 
 void initialize_CUDA(int rank);
 
@@ -31,8 +31,6 @@ int main(int argc, char** argv){
         sum += array[i];
     }
 
-    MPI_Reduce(&sum,&finalSum,sizeof(MPI_DOUBLE),MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-
     //Display results for root process
     if(rank == 0){
 
@@ -45,8 +43,13 @@ int main(int argc, char** argv){
         printf("CPU Reduce time: %f\n", reduceTime);  
     }
 
+    else{
+        MPI_Reduce(&sum,&finalSum,sizeof(MPI_DOUBLE),MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+    }
+
     initialize_CUDA(rank);
     reduceSeven(&sum,&finalSum,ARRAY_SIZE);
+
     
     if(rank == 0){
         double start_cycles=clock_now();
@@ -57,6 +60,9 @@ int main(int argc, char** argv){
         double reduceTime = (end_cycles - start_cycles)/clock_frequency;
 
         printf("CUDA Reduce time: %f\n", reduceTime);  
+    }
+    else{
+        MPI_Reduce(&sum,&finalSum,sizeof(MPI_DOUBLE),MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
     }
 
     free(array);
