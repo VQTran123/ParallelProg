@@ -50,7 +50,7 @@ int main(int argc, char** argv){
     
     if(rank == 0){
         double start_cycles=clock_now()
-        reduceSeven(&sum,&finalSum,ARRAY_SIZE);
+        reduceSeven(&sum,&finalSum,ARRAY_SIZE/size);
         MPI_Reduce(&sum,&finalSum,sizeof(MPI_DOUBLE),MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
         double end_cycles=clock_now();
 
