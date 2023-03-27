@@ -7,9 +7,9 @@
 #define warpSize 32
 #define blockSize 1024
 #define elements 1610612736
+#define nIsPow2 true
 
-template <typename T, bool nIsPow2>
-__global__ void reduce7(T *g_idata, T *g_odata,
+__global__ void reduce7(double *g_idata, double *g_odata,
                         unsigned int n) {
   extern __shared__ double __smem_d[];
   double *sdata = (double *)__smem_d;
@@ -75,12 +75,11 @@ __global__ void reduce7(T *g_idata, T *g_odata,
   }
 }
 
-template <typename T>
-extern "C" void reduceSeven(T *g_idata, T *g_odata,
+extern "C" void reduceSeven(double *g_idata, double *g_odata,
                         unsigned int n){
                             int smemSize = ((blockSize / 32) + 1) * sizeof(int);
                             int gridSize = n / blockSize;
-                            reduce7<double, true><<<gridSize,blockSize,smemSize>>>(g_idata, g_odata, n);
+                            reduce7<<<gridSize,blockSize,smemSize>>>(g_idata, g_odata, n);
                         }
 
 extern "C" void initialize_CUDA(int rank){
