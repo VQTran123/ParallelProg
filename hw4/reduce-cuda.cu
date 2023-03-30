@@ -3,6 +3,8 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
+#include <cooperative_groups.h>
+#include <cooperative_groups/reduce.h>
 
 #define warpSize 32
 #define blockSize 1024
@@ -83,13 +85,13 @@ extern "C" void reduceSeven(double *g_idata, double *g_odata,
 
 extern "C" void initialize_CUDA(int rank){
     int cudaDeviceCount;
-    if( (cE = cudaGetDeviceCount( &cudaDeviceCount)) != cudaSuccess )
+    if( (int cE = cudaGetDeviceCount( &cudaDeviceCount)) != cudaSuccess )
     {
         printf(" Unable to determine cuda device count, error is %d, count is %d\n",
             cE, cudaDeviceCount );
         exit(-1);
     }
-    if( (cE = cudaSetDevice( rank % cudaDeviceCount )) != cudaSuccess )
+    if( (int cE = cudaSetDevice( rank % cudaDeviceCount )) != cudaSuccess )
     {
         printf(" Unable to have rank %d set to cuda device %d, error is %d \n",
             rank, (rank % cudaDeviceCount), cE);
