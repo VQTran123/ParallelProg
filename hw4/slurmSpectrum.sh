@@ -1,3 +1,4 @@
+#!/bin/sh
 module load spectrum-mpi cuda/11.2
 ############################################################################################
 # Launch N tasks per compute node allocated. Per below this launches 6 MPI rank per compute# taskset insures that hyperthreaded cores are skipped.
