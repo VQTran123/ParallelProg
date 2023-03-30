@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include "clockcycle.h"
-#include "reduce-cuda.cu"
+//#include "reduce-cuda.cu"
 
 #define ARRAY_SIZE 1610612736
 #define clock_frequency 512000000
