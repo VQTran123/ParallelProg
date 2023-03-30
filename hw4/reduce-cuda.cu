@@ -51,7 +51,7 @@ __global__ void reduce7(double *g_idata, double *g_odata,
 
   // Reduce within warp using shuffle or reduce_add if T==int & CUDA_ARCH ==
   // SM 8.0
-  mySum = __reduce_add_sync(mask, mySum);
+  mySum = reduce_add(mask, mySum);
 
   // each thread puts its local sum into shared memory
   if ((tid % warpSize) == 0) {
@@ -67,7 +67,7 @@ __global__ void reduce7(double *g_idata, double *g_odata,
     mySum = sdata[tid];
     // Reduce final warp using shuffle or reduce_add if T==int & CUDA_ARCH ==
     // SM 8.0
-    mySum = __reduce_add_sync(ballot_result, mySum);
+    mySum = reduce_add(ballot_result, mySum);
   }
 
   // write result for this block to global mem
