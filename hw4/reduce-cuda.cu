@@ -85,13 +85,15 @@ extern "C" void reduceSeven(double *g_idata, double *g_odata,
 
 extern "C" void initialize_CUDA(int rank){
     int cudaDeviceCount;
-    if( (int cE = cudaGetDeviceCount( &cudaDeviceCount)) != cudaSuccess )
+    int cE = cudaGetDeviceCount( &cudaDeviceCount);
+    if( cE != cudaSuccess )
     {
         printf(" Unable to determine cuda device count, error is %d, count is %d\n",
             cE, cudaDeviceCount );
         exit(-1);
     }
-    if( (int cE = cudaSetDevice( rank % cudaDeviceCount )) != cudaSuccess )
+    cE = cudaGetDeviceCount( &cudaDeviceCount);
+    if( cE != cudaSuccess )
     {
         printf(" Unable to have rank %d set to cuda device %d, error is %d \n",
             rank, (rank % cudaDeviceCount), cE);
