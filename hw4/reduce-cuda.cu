@@ -3,8 +3,6 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
-#include <cooperative_groups.h>
-#include <cooperative_groups/reduce.h>
 
 #define warpSize 32
 #define blockSize 1024
